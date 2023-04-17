@@ -1,65 +1,74 @@
-console.log('JS file loaded successfully');
-
 document.addEventListener("DOMContentLoaded", function() {
-  const canvas = document.getElementById("game-canvas");
-  const container = document.getElementById("game-container");
-  canvas.width = container.clientWidth+1;
-  canvas.height = container.clientHeight;
-  const ctx = canvas.getContext("2d");
+  const canvas = document.getElementById("game-canvas"),
+        container = document.getElementById("game-container"),
+        images = [          ["./mountain_bg.png", "mountainLayer1"],
+          ["./mountain_bg2.png", "mountainLayer2"],
+          ["./background.png", "backgroundImage"],
+          ["./foreground.png", "foregroundImage"],
+          ["./puffer.png", "mainCharacter"],
+        ];
+  let mainCharacterX = 50,
+      mainCharacterY = 250,
+      ctx = canvas.getContext("2d"),
+      assetsLoaded = 0,
+      assetsToLoad = images.length;
 
-  // load images
-  const mountainLayer1 = new Image();
-  mountainLayer1.src = "./mountain_bg.png";
+  images.forEach(([src, name]) => {
+    window[name] = new Image();
+    window[name].onload = () => {
+      assetsLoaded++;
+      if (assetsLoaded === assetsToLoad) {
+        draw();
+      }
+    };
+    window[name].src = src;
+  });
 
-  const mountainLayer2 = new Image();
-  mountainLayer2.src = "./mountain_bg2.png";
+  function draw() {
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    const scaleX = canvas.width / backgroundImage.width,
+          scaleY = canvas.height / backgroundImage.height,
+          scale = Math.max(scaleX, scaleY),
+          bgWidth = backgroundImage.width * scale,
+          bgHeight = backgroundImage.height * scale,
+          mountainScale = mountainLayer1.naturalWidth * scale / mountainLayer1.width,
+          fgWidth = foregroundImage.width * scale,
+          fgHeight = foregroundImage.height * scale,
+          fgY = canvas.height - fgHeight,
+          characterScale = (mainCharacter.width * scale) / 2 / mainCharacter.width,
+          characterWidth = mainCharacter.width * characterScale,
+          characterHeight = mainCharacter.height * characterScale;
 
-  const backgroundImage = new Image();
-  backgroundImage.src = "./background.png";
+    // center character horizontally
+    let fgX = canvas.width / 2 - mainCharacterX * scale;
 
-  const foregroundImage = new Image();
-  foregroundImage.src = "./foreground.png";
-
-  const mainCharacter = new Image();
-  mainCharacter.src = "./puffer.png";
-
-  // set initial position of the main character
-  let mainCharacterX = 50;
-  let mainCharacterY = 250;
-
-  // define function to draw the main character on the canvas
-  const draw = () => {
-    // clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
-    // draw the mountain images
-    ctx.drawImage(mountainLayer1, 0, 150, mountainLayer1.naturalWidth * 0.75, mountainLayer1.naturalHeight );
-    ctx.drawImage(mountainLayer2, 0, 150, mountainLayer2.naturalWidth * 0.75, mountainLayer2.naturalHeight );
-    // draw the main character
-    ctx.drawImage(foregroundImage, 0, canvas.height - foregroundImage.naturalHeight * 1.41, canvas.width, foregroundImage.naturalHeight);
-
-    ctx.drawImage(mainCharacter, mainCharacterX, mainCharacterY);
-  };
-
-  // call the draw function to draw the initial state of the game
-  draw();
-
-  // define function to update the position of the main character based on arrow key input
-  const updatePosition = (event) => {
-    if (event.keyCode === 37) { // left arrow
-      mainCharacterX -= 5;
-    } else if (event.keyCode === 39) { // right arrow
-      mainCharacterX += 5;
-    } else if (event.keyCode === 38) { // up arrow
-      mainCharacterY -= 5;
-    } else if (event.keyCode === 40) { // down arrow
-      mainCharacterY += 5;
+    // prevent character from moving off right side of screen
+    if (fgX < canvas.width - fgWidth - mainCharacterX * scale) {
+      fgX = canvas.width - fgWidth - mainCharacterX * scale;
     }
-  };
 
-  // add event listener to update position of main character based on arrow key input
-  document.addEventListener("keydown", updatePosition);
+    // prevent character from moving off left side of screen
+    if (fgX > -mainCharacterX * scale) {
+      fgX = -mainCharacterX * scale;
+    }
 
-  // call the draw function every 10 milliseconds to update the canvas
+    const characterX = canvas.width / 2,
+          characterY = mainCharacterY * scale;
+
+    ctx.drawImage(backgroundImage, 0, 0, bgWidth, bgHeight);
+    ctx.drawImage(mountainLayer1, -mainCharacterX / 20, canvas.height - mountainLayer1.height * mountainScale, mountainLayer1.width * mountainScale, mountainLayer1.height * mountainScale);
+    ctx.drawImage(mountainLayer2, -mainCharacterX / 40, canvas.height - mountainLayer2.height * mountainScale, mountainLayer2.width * mountainScale, mountainLayer2.height * mountainScale);
+    ctx.drawImage(foregroundImage, fgX, fgY, fgWidth, fgHeight);
+    ctx.drawImage(mainCharacter, characterX - characterWidth / 2, characterY, characterWidth, characterHeight);
+  }
+
+  window.addEventListener("resize", draw);
+  document.addEventListener("keydown", function(event) {
+    event.keyCode === 37 ? mainCharacterX -= 5 :
+    event.keyCode === 39 ? mainCharacterX += 5 :
+    event.keyCode === 38 ? mainCharacterY -= 5 :
+    event.keyCode === 40 && (mainCharacterY += 5);
+  });
   setInterval(draw, 10);
 });

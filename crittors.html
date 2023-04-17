@@ -65,7 +65,7 @@
       opacity: 0.8;
       pointer-events: none;
       transform: scale(1);
-      animation: cloud 5s linear forwards;
+      animation: cloud 75s linear forwards;
       background-position: 0 0;
       left: -20%;
     }
@@ -91,13 +91,13 @@
     <div id="game-wrapper">
       <div id="game-container">
         <canvas id="game-canvas"></canvas>
-        <div class="clouds">
-          <div class="cloud"></div>
-          <div class="cloud"></div>
-          <div class="cloud"></div>
-        </div>
+        
       </div>
-     
+      <div class="clouds">
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+      </div>
     </div>
     <script>
       const cloudsContainer = document.querySelector('.clouds');
@@ -122,3 +122,4 @@
 
   </body>
 </html>
+  

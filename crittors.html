@@ -3,32 +3,44 @@
   <head>
     <meta charset="UTF-8">
     <title>Game</title>
+    <script src="game.js"></script>
     <style>
-     body {
-      margin: 0;
-      padding: 0;
-    }
-    
-    #game-wrapper {
-      position: relative;
-      margin: 0 auto;
-      width: 70%;
-      height: 80vh;
-      border: 10px solid rgb(0, 0, 0);
-      overflow: hidden;
-    }
+    body {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
 
-    #game-container {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-image: url('./background.png');
-      background-size: 100% 100%;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
+#game-wrapper {
+  box-sizing: border-box;
+  position: relative;
+  width: 70%;
+  height: 80vh;
+  border: 10px solid black;
+  overflow: hidden;
+  display: inline-block;
+  text-align: left;
+  margin: 0;
+  padding: 0;
+
+}
+
+#game-container {
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+  margin: 0;
+
+}
+
+#game-canvas {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+
+}
 
     #foreground {
       position: absolute;
@@ -36,12 +48,19 @@
       left: 0;
       width: 100%;
       height: 50%;
-      background-image: url('./foreground.png');
-      background-size: auto 100%;
-      background-repeat: no-repeat;
-      background-position: center;
+      background: url('./foreground.png') no-repeat center / auto 100%;
       z-index: 2;
     }
+    #player {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 50px;
+  height: 100px;
+  z-index: 3;
+  background: url('./puffer.png') no-repeat center / auto 100%;
+
+}
 
     .clouds {
       position: absolute;
@@ -56,9 +75,7 @@
     .cloud {
       position: absolute;
       display: block;
-      background-image: url('./cloud_scroll.png');
-      background-repeat: repeat-x;
-      background-size: contain;
+      background: url('./cloud_scroll.png') repeat-x center / contain;
       width: 50%;
       height: 100%;
       border-radius: 0%;
@@ -93,7 +110,6 @@
         transform: translateX(300%);
       }
     }
-
     .mountain-1 {
   z-index: 0;
   background-image: url('./mountain_bg.png');
@@ -102,10 +118,10 @@
   width: 400px;
   height: 400px;
   position: absolute;
-  bottom: -380px;
+  bottom: -480px;
   left: 50%;
   margin-left: -200px; /* half of the width */
-  transform: scale(2.75);
+  transform: scale(2.5, 3.5);
 }
 
 .mountain-2 {
@@ -122,15 +138,14 @@
   transform: scale(2.75);
 
 }
+
     </style>
   </head>
   <body>
     <div id="game-wrapper">
       <div id="game-container">
-        <div id="foreground"></div>
         <canvas id="game-canvas"></canvas>
-        <div class="mountain mountain-1"></div>
-        <div class="mountain mountain-2"></div>
+        
       </div>
       <div class="clouds">
         <div class="cloud"></div>
@@ -158,5 +173,6 @@
         cloud.addEventListener('animationend', handleAnimationEnd);
       });
     </script>
+
   </body>
 </html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Game</title>
+    <style>
+     body {
+      margin: 0;
+      padding: 0;
+    }
+    
+    #game-wrapper {
+      position: relative;
+      margin: 0 auto;
+      width: 70%;
+      height: 80vh;
+      border: 10px solid rgb(0, 0, 0);
+      overflow: hidden;
+    }
+
+    #game-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: url('./background.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
+    #foreground {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      background-image: url('./foreground.png');
+      background-size: auto 100%;
+      background-repeat: no-repeat;
+      background-position: center;
+      z-index: 2;
+    }
+
+    .clouds {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .cloud {
+      position: absolute;
+      display: block;
+      background-image: url('./cloud_scroll.png');
+      background-repeat: repeat-x;
+      background-size: contain;
+      width: 50%;
+      height: 100%;
+      border-radius: 0%;
+      opacity: 0.8;
+      pointer-events: none;
+      transform: scale(1);
+      animation: cloud 55s linear forwards;
+      background-position: 0 0;
+      left: -20%;
+    }
+
+    .cloud:nth-child(1) {
+      top: 5%;
+      left: 10%;
+    }
+
+    .cloud:nth-child(2) {
+      top: 6%;
+      left: 50%;
+    }
+
+    .cloud:nth-child(3) {
+      top: 3%;
+      left: 30%;
+    }
+
+    @keyframes cloud {
+      0% {
+        transform: translateX(-100%);
+      }
+      100% {
+        transform: translateX(300%);
+      }
+    }
+
+    .mountain-1 {
+  z-index: 0;
+  background-image: url('./mountain_bg.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  bottom: -380px;
+  left: 50%;
+  margin-left: -200px; /* half of the width */
+  transform: scale(2.75);
+}
+
+.mountain-2 {
+    z-index: 1;
+  background-image: url('./mountain_bg2.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  width: 400px;
+  height: 400px;
+  position: absolute;
+  bottom: -400px;
+  left: 50%;
+  margin-left: -200px; /* half of the width */
+  transform: scale(2.75);
+
+}
+    </style>
+  </head>
+  <body>
+    <div id="game-wrapper">
+      <div id="game-container">
+        <div id="foreground"></div>
+        <canvas id="game-canvas"></canvas>
+        <div class="mountain mountain-1"></div>
+        <div class="mountain mountain-2"></div>
+      </div>
+      <div class="clouds">
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+        <div class="cloud"></div>
+      </div>
+    </div>
+    <script>
+      const cloudsContainer = document.querySelector('.clouds');
+      const clouds = Array.from(document.querySelectorAll('.cloud'));
+
+      function handleAnimationEnd(event) {
+        if (event.animationName === 'cloud') {
+          const cloud = event.target;
+          cloud.removeEventListener('animationend', handleAnimationEnd);
+          cloud.remove();
+          const newCloud = document.createElement('div');
+          newCloud.classList.add('cloud');
+          cloudsContainer.appendChild(newCloud);
+          newCloud.addEventListener('animationend', handleAnimationEnd);
+        }
+      }
+
+      clouds.forEach((cloud) => {
+        cloud.addEventListener('animationend', handleAnimationEnd);
+      });
+    </script>
+  </body>
+</html>

@@ -42,25 +42,8 @@
 
 }
 
-    #foreground {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 50%;
-      background: url('./foreground.png') no-repeat center / auto 100%;
-      z-index: 2;
-    }
-    #player {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  width: 50px;
-  height: 100px;
-  z-index: 3;
-  background: url('./puffer.png') no-repeat center / auto 100%;
+ 
 
-}
 
     .clouds {
       position: absolute;
@@ -82,25 +65,15 @@
       opacity: 0.8;
       pointer-events: none;
       transform: scale(1);
-      animation: cloud 55s linear forwards;
+      animation: cloud 5s linear forwards;
       background-position: 0 0;
       left: -20%;
     }
-
     .cloud:nth-child(1) {
       top: 5%;
       left: 10%;
     }
 
-    .cloud:nth-child(2) {
-      top: 6%;
-      left: 50%;
-    }
-
-    .cloud:nth-child(3) {
-      top: 3%;
-      left: 30%;
-    }
 
     @keyframes cloud {
       0% {
@@ -110,34 +83,7 @@
         transform: translateX(300%);
       }
     }
-    .mountain-1 {
-  z-index: 0;
-  background-image: url('./mountain_bg.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 400px;
-  height: 400px;
-  position: absolute;
-  bottom: -480px;
-  left: 50%;
-  margin-left: -200px; /* half of the width */
-  transform: scale(2.5, 3.5);
-}
-
-.mountain-2 {
-    z-index: 1;
-  background-image: url('./mountain_bg2.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  width: 400px;
-  height: 400px;
-  position: absolute;
-  bottom: -400px;
-  left: 50%;
-  margin-left: -200px; /* half of the width */
-  transform: scale(2.75);
-
-}
+   
 
     </style>
   </head>
@@ -145,13 +91,13 @@
     <div id="game-wrapper">
       <div id="game-container">
         <canvas id="game-canvas"></canvas>
-        
+        <div class="clouds">
+          <div class="cloud"></div>
+          <div class="cloud"></div>
+          <div class="cloud"></div>
+        </div>
       </div>
-      <div class="clouds">
-        <div class="cloud"></div>
-        <div class="cloud"></div>
-        <div class="cloud"></div>
-      </div>
+     
     </div>
     <script>
       const cloudsContainer = document.querySelector('.clouds');

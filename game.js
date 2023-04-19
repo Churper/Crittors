@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function() {
   let fps = 0;
   let [charWorldX, charWorldY] = [0.1, 105];
   let prevAnimFrame = 0;
-  const charSpeed1 = 1; // adjust this value to control the character speed
+  const charSpeed1 = 3; // adjust this value to control the character speed
 
   let lastTime1 = performance.now();
   const c = document.getElementById("game-canvas"), 
@@ -23,12 +23,12 @@ let setted = 0;
   let animFrame = 0; // current frame of animation
   let animCounter = 0; // frame counter for animation timing
   let lastTime = 0;
-  const animSpeed = 20; // milliseconds between frames
+  const animSpeed = 1; // milliseconds between frames
 
-const animDelay = Math.floor(animSpeed  +30); // number of frames between animation updates
+const animDelay = Math.floor(animSpeed  +45); // number of frames between animation updates
   let isMoving = false; // flag for character movement 
   let isAttacking = false; // flag for atkl movement
-  const moveDelay = -1; // number of milliseconds between position updates
+  const moveDelay = 0; // number of milliseconds between position updates
   let moveIntervalId = null; // interval ID for position updates
   let bgW, bgH, s, mS, fgW, fgH, fgS, fgWS, fgHS, fgY,fgX,charS,charW,charH,charX,charY;
   const charImage = new Image();
@@ -149,7 +149,7 @@ g.drawImage(fg, 0, fgY, fgWS, fgHS);
   }
   
   function requestAnimationFrameLimited(callback) {
-    const fps = 30;
+    const fps = 60;
     const interval = 1000 / fps;
     const timeNow = performance.now();
     const delta = timeNow - lastTime;

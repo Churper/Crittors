@@ -1,54 +1,72 @@
 document.addEventListener("DOMContentLoaded", function() {
-  const canvasWidth = 100;
-  const canvasHeight = 100;
+  const canvasWidth = 800;
+  const canvasHeight = 600;
   let lastPositionUpdateTime = 0;
+  let timeSinceLastUpdate = 0;
 
+  let frameCount = 0;
+  let fps = 0;
+  let [charWorldX, charWorldY] = [0.1, 105];
+  let prevAnimFrame = 0;
+  const charSpeed1 = 1; // adjust this value to control the character speed
+
+  let lastTime1 = performance.now();
   const c = document.getElementById("game-canvas"), 
         g = c.getContext("2d"), 
         container = document.getElementById("game-container");
-        c.width = canvasWidth;
-c.height = canvasHeight;
-c.width = container.clientWidth + 1;
+  c.width = canvasWidth;
+  c.height = canvasHeight;
+  c.width = container.clientWidth + 2;
   c.height = container.clientHeight;
-
-  let [rX, rY, loaded, toLoad] = [0.1, 105, 0, 5];
+let setted = 0;
+  let [rX, rY, loaded, toLoad] = [0.1, 105, 0, 6];
   let animFrame = 0; // current frame of animation
   let animCounter = 0; // frame counter for animation timing
-  const animDelay = 50; // number of frames between animation updates
   let lastTime = 0;
-const animSpeed = 10; // milliseconds between frames
+  const animSpeed = 20; // milliseconds between frames
+
+const animDelay = Math.floor(animSpeed  +30); // number of frames between animation updates
   let isMoving = false; // flag for character movement 
   let isAttacking = false; // flag for atkl movement
-  let attackStarted = false; // flag for whether an attack animation has started
-  const moveDelay = 5; // number of milliseconds between position updates
-let moveIntervalId = null; // interval ID for position updates
+  const moveDelay = -1; // number of milliseconds between position updates
+  let moveIntervalId = null; // interval ID for position updates
+  let bgW, bgH, s, mS, fgW, fgH, fgS, fgWS, fgHS, fgY,fgX,charS,charW,charH,charX,charY;
   const charImage = new Image();
-  function updatePosition(currentTime) {
-    // calculate time difference since last frame
-    const timeDiff = currentTime - lastPositionUpdateTime;
-  
-    // update player position if isMoving flag is true
-    if (isMoving) {
-      rX += 0.0001 * timeDiff; // update position by 0.1 pixels per millisecond
-    }
-  
-    // store current time as last position update time
-    lastPositionUpdateTime = currentTime;
-  
-    // request next animation frame
-    requestAnimationFrame(updatePosition);
-  }
-  
-  // call updatePosition for the first time
-  requestAnimationFrame(updatePosition);
-
-  
+  const char = new Image();
   charImage.onload = function() {
-    draw();
-  };
-  charImage.src = "./imp_walk.png";
+  
+  char.src = "./imp_walk.png";
+ s = Math.max(c.width / bg.width, c.height / bg.height);
+  bgW = bg.width * s;
+  bgH = bg.height * s;
+  mS = mountain1.naturalWidth * s / mountain1.width;
+  fgW = fg.width * s;
+  fgH = fg.height * s;
+  fgS = 0.5;
+  fgWS = fgW * fgS;
+  fgHS = fgH * fgS;
+  
+  fgY = c.height - fgHS - (fgHS * 0.4);
+  draw();
+};
+char.onload = function() {
+  charS = (char.width * s) / 3 / char.width;
+  charW = frameWidth * charS;
+  charH = frameHeight * charS;
+ if (setted == 0){ 
+  charX = (c.width ) / 2 ;
+ charY = (c.height)/2;
+ setted =1;
 
+}
+//rX = charX / bgW;
+  fgX = -Math.floor(rX * bgW) % fgWS;
+ // draw();
+ // frameWidth = char.width / 12;
+};
+charImage.src = "./imp_walk.png";
 
+  
   const imgs = [
     ["./mountain_bg.png", "mountain1"],
     ["./mountain_bg2.png", "mountain2"],
@@ -65,120 +83,139 @@ let moveIntervalId = null; // interval ID for position updates
   });
 
   let lastAnimationFrameTime = 0;
-let swapper = true;
-function draw() {
- 
- let frameWidth;
- if (isAttacking) {
-   frameWidth = charAttack.width / 13;
- } else {
-   frameWidth = char.width / 12;
- }
+  let swapper = true;
 
- 
-  const frameHeight = 335;
-  //c.width = container.clientWidth + 1;
-  //c.height = container.clientHeight;
+  
+  const frameHeight = 335; // adjust this value based on your sprite sheet
+  let frameWidth = 251;
 
-  const sX = c.width / bg.width,
-    sY = c.height / bg.height,
-    s = Math.max(sX, sY),
-    bgW = bg.width * s,
-    bgH = bg.height * s,
-    mS = mountain1.naturalWidth * s / mountain1.width;
+  function draw() {
+  
+    g.clearRect(0, 0, c.width, c.height);
 
-  const fgW = fg.width * s,
-    fgH = fg.height * s,
-    fgS = 0.5,
-    fgWS = fgW * fgS,
-    fgHS = fgH * fgS,
-    fgY = c.height - fgHS - (fgHS * 0.4);
+    const playerOffsetX = charX - c.width / 2;
+    const playerOffsetY = charY - c.height / 2;
 
-  let fgX = -Math.floor(rX * bgW) % fgWS;
+  // Translate the canvas context to the player's position
+  g.translate(-playerOffsetX, -playerOffsetY);
 
-  const charS = (char.width * s) / 3 / char.width;
-  const charW = frameWidth * charS;
-  const charH = frameHeight * charS;
-  let charX = (c.width - charW) / 2;
-  if (isAttacking) {
-    charX += 55 * s;
-  }
-  const charY = rY * s + (bgH - fgHS - charH);
+    g.drawImage(bg, 0, 0, bgW, bgH);
+    g.drawImage(mountain1, -Math.floor(rX * bgW / 2), c.height - mountain1.height * mS * .75, mountain1.width * mS / 2, mountain1.height * mS / 2);
+    g.drawImage(mountain2, -Math.floor(rX * bgW / 4), c.height - mountain2.height * mS * .72, mountain2.width * mS / 2, mountain2.height * mS / 2);
 
-  g.clearRect(0, 0, c.width, c.height); // clear the canvas
+let tileCount = 0;
+let i = fgX;
 
-  g.drawImage(bg, 0, 0, bgW, bgH);
-  g.drawImage(mountain1, -Math.floor(rX * bgW / 2), c.height - mountain1.height * mS * .75, mountain1.width * mS / 2, mountain1.height * mS / 2);
-  g.drawImage(mountain2, -Math.floor(rX * bgW / 4), c.height - mountain2.height * mS * .72, mountain2.width * mS / 2, mountain2.height * mS / 2);
+g.drawImage(fg, 0, fgY, fgWS, fgHS);
 
-  for (let i = fgX; i < c.width; i += fgWS) {
-    g.drawImage(fg, i, fgY, fgWS, fgHS);
-  }
 
-  let frameX, frameY;
-  const now = performance.now();
-  const timeSinceLastFrame = now - lastAnimationFrameTime;
-  if (isMoving && timeSinceLastFrame >= animDelay) {
-    animCounter++;
-    lastAnimationFrameTime = now;
-    animFrame++;
-    if (animFrame >= 12) {
+  
+    const now = performance.now();
+    const timeSinceLastFrame = now - lastAnimationFrameTime;
+    const timeSinceLastPositionUpdate = now - lastPositionUpdateTime;
+
+    if (timeSinceLastFrame >= animDelay) {
+      animCounter++;
+      lastAnimationFrameTime = now;
+  
+      if (isMoving && timeSinceLastPositionUpdate >= moveDelay) {
+        animFrame = (animFrame + 1) % 12;
+        charX += charSpeed1;
+        lastPositionUpdateTime = now;
+    }
+
+    if (isAttacking) {
+        animFrame = (animFrame + 1) % 7;
+    }
+    }
+    if (animFrame < prevAnimFrame) {
+      // animation has completed a cycle, reset animFrame to 0
       animFrame = 0;
     }
-  }
-  if (isAttacking && timeSinceLastFrame >= animDelay) {
-    animCounter++;
-    lastAnimationFrameTime = now;
-    animFrame++;
-  } else if (isAttacking && animFrame >= 13) { // end of attack animation
-    
-    animFrame = 0; // reset animFrame to loop attack animation
-  }
-  
-  // frameXAttack = Math.floor(animFrame) * frameWidthAttack;
-  frameX = Math.floor(animFrame) * frameWidth;
-  frameY = 0;
+    const sourceX = animFrame * frameWidth;
+   
 
-  g.drawImage(charImage, frameX, frameY, frameWidth, frameHeight, charX - charW / 2, charY, charW, charH);
+    prevAnimFrame = animFrame;
+    if(isAttacking){    g.drawImage(char, sourceX, 0, frameWidth, frameHeight, charX - charW / 2 + 68, charY, charW, charH);
+  }
+  else{
+    g.drawImage(char, sourceX, 0, frameWidth, frameHeight, charX - charW / 2, charY, charW, charH);
+  }
+  g.translate(playerOffsetX, playerOffsetY);
  
-  requestAnimationFrame(draw);
-}
+  console.log(charX);
+  drawFPS();
+  requestAnimationFrameLimited(draw);
+  }
+  
+  function requestAnimationFrameLimited(callback) {
+    const fps = 30;
+    const interval = 1000 / fps;
+    const timeNow = performance.now();
+    const delta = timeNow - lastTime;
+    if (delta > interval) {
+      lastTime = timeNow - (delta % interval);
+      callback();
+    } else {
+      setTimeout(() => requestAnimationFrameLimited(callback), interval - delta);
+    }
+    //updateFPS();
+  }
+  
+  
+  function drawFPS() {
+    const now = performance.now();
+    const elapsedMs = now - lastTime1;
+    if (elapsedMs >= 1000) {
+      fps = Math.round((frameCount * 1000) / elapsedMs);
+      lastTime1 = now;
+      frameCount = 0;
+    }
+    g.fillStyle = "white";
+    g.font = "bold 16px Arial";
+    g.fillText(`FPS: ${fps}`, 10, 20);
+    frameCount++;
+  }
+  
 
-  
-  
   
   
   
   
 
   window.addEventListener("resize", draw);
+
   document.addEventListener("keydown", function(event) {
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "ArrowUp" || event.key === "ArrowDown") {
-      isMoving = true;
-      startMoving();
-      // rX += event.key === "ArrowLeft" ? -0.001 : event.key === "ArrowRight" ? .001 : 0;
-      // rY += event.key === "ArrowUp" ? -5 : event.key === "ArrowDown" ? 5 : 0;
-      charImage.src = "./imp_walk.png"; // toggle the charImage variable to the walking animation
-    } else if (event.keyCode === 32 && !isAttacking) {
-      // start attack animation
-      isAttacking = true;
-      attackStarted = true;
-      charImage.src = "./imp_attack.png"; // toggle the charImage variable to the attacking animation
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
+    // Player is moving
+    isMoving = true;
+    charImage.src = "./imp_walk.png";
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight" ) {
+      // Change the direction of the character
+      charImage.style.transform = `scaleX(${event.key === "ArrowLeft" ? -1 : 1})`;
     }
-  });
-  
-  document.addEventListener("keyup", function(event) {
-    if (event.key === " ") {
-      isAttacking = false;
-      frameWidth = char.width / 12;
-      charImage.src = "./imp_walk.png";
-      animFrame = 0;
-    }
-    if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "ArrowUp" || event.key === "ArrowDown") {
-      isMoving = false;
-      animFrame = 0;
-    }
-  });
+  } else if (event.code === "Space" && !isAttacking) {
+    // Player is attacking
+    isAttacking = true;
+    char.src = "./imp_attack.png";
+    frameWidth = 382;
+  }
+});
+
+document.addEventListener("keyup", function(event) {
+  if (event.code === "Space") {
+    // Player has stopped attacking
+    isAttacking = false;
+    frameWidth = charImage.width / 12;
+    charImage.src = "./imp_walk.png";
+    animFrame = 0;
+  } else if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
+    // Player has stopped moving
+    isMoving = false;
+    animFrame = 0;
+  }
+});
+
   
   
   function animate() {

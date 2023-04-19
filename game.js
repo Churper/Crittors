@@ -1,9 +1,15 @@
 document.addEventListener("DOMContentLoaded", function() {
+  const canvasWidth = 100;
+  const canvasHeight = 100;
+  let lastPositionUpdateTime = 0;
 
-  
   const c = document.getElementById("game-canvas"), 
         g = c.getContext("2d"), 
         container = document.getElementById("game-container");
+        c.width = canvasWidth;
+c.height = canvasHeight;
+c.width = container.clientWidth + 1;
+  c.height = container.clientHeight;
 
   let [rX, rY, loaded, toLoad] = [0.1, 105, 0, 5];
   let animFrame = 0; // current frame of animation
@@ -14,7 +20,29 @@ const animSpeed = 10; // milliseconds between frames
   let isMoving = false; // flag for character movement 
   let isAttacking = false; // flag for atkl movement
   let attackStarted = false; // flag for whether an attack animation has started
+  const moveDelay = 5; // number of milliseconds between position updates
+let moveIntervalId = null; // interval ID for position updates
   const charImage = new Image();
+  function updatePosition(currentTime) {
+    // calculate time difference since last frame
+    const timeDiff = currentTime - lastPositionUpdateTime;
+  
+    // update player position if isMoving flag is true
+    if (isMoving) {
+      rX += 0.0001 * timeDiff; // update position by 0.1 pixels per millisecond
+    }
+  
+    // store current time as last position update time
+    lastPositionUpdateTime = currentTime;
+  
+    // request next animation frame
+    requestAnimationFrame(updatePosition);
+  }
+  
+  // call updatePosition for the first time
+  requestAnimationFrame(updatePosition);
+
+  
   charImage.onload = function() {
     draw();
   };
@@ -46,11 +74,11 @@ function draw() {
  } else {
    frameWidth = char.width / 12;
  }
- 
+
  
   const frameHeight = 335;
-  c.width = container.clientWidth + 1;
-  c.height = container.clientHeight;
+  //c.width = container.clientWidth + 1;
+  //c.height = container.clientHeight;
 
   const sX = c.width / bg.width,
     sY = c.height / bg.height,
@@ -73,7 +101,7 @@ function draw() {
   const charH = frameHeight * charS;
   let charX = (c.width - charW) / 2;
   if (isAttacking) {
-    charX += 50 * s;
+    charX += 55 * s;
   }
   const charY = rY * s + (bgH - fgHS - charH);
 
@@ -83,9 +111,8 @@ function draw() {
   g.drawImage(mountain1, -Math.floor(rX * bgW / 2), c.height - mountain1.height * mS * .75, mountain1.width * mS / 2, mountain1.height * mS / 2);
   g.drawImage(mountain2, -Math.floor(rX * bgW / 4), c.height - mountain2.height * mS * .72, mountain2.width * mS / 2, mountain2.height * mS / 2);
 
-  while (fgX < c.width) {
-    g.drawImage(fg, fgX, fgY, fgWS, fgHS);
-    fgX += fgWS;
+  for (let i = fgX; i < c.width; i += fgWS) {
+    g.drawImage(fg, i, fgY, fgWS, fgHS);
   }
 
   let frameX, frameY;
@@ -126,10 +153,11 @@ function draw() {
 
   window.addEventListener("resize", draw);
   document.addEventListener("keydown", function(event) {
-    if (event.keyCode === 37 || event.keyCode === 39 || event.keyCode === 38 || event.keyCode === 40) {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "ArrowUp" || event.key === "ArrowDown") {
       isMoving = true;
-      rX += event.keyCode === 37 ? -0.001 : event.keyCode === 39 ? .001 : 0;
-      rY += event.keyCode === 38 ? -5 : event.keyCode === 40 ? 5 : 0;
+      startMoving();
+      // rX += event.key === "ArrowLeft" ? -0.001 : event.key === "ArrowRight" ? .001 : 0;
+      // rY += event.key === "ArrowUp" ? -5 : event.key === "ArrowDown" ? 5 : 0;
       charImage.src = "./imp_walk.png"; // toggle the charImage variable to the walking animation
     } else if (event.keyCode === 32 && !isAttacking) {
       // start attack animation
@@ -139,18 +167,20 @@ function draw() {
     }
   });
   
-  
   document.addEventListener("keyup", function(event) {
-    if (event.keyCode === 32) {
+    if (event.key === " ") {
       isAttacking = false;
       frameWidth = char.width / 12;
-      charImage.src = "./imp_walk.png"
-      animFrame=0;
+      charImage.src = "./imp_walk.png";
+      animFrame = 0;
     }
-    if (event.keyCode === 37 || event.keyCode === 39 || event.keyCode === 38 || event.keyCode === 40)
-    {isMoving=false;
-    animFrame=0;}
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === "ArrowUp" || event.key === "ArrowDown") {
+      isMoving = false;
+      animFrame = 0;
+    }
   });
+  
+  
   function animate() {
     requestAnimationFrame(animate);
     draw();
